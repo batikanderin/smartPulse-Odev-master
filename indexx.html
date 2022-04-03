@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    
+    <div id='content'>
+        <table id='days' cellpadding='10px'  class="styled-table">
+            <thead class="styled-table thead tr">
+                <tr>
+                    <th>Tarih</th>
+                    <th>Toplam İşlem Miktarı</th>
+                    <th>Toplam İşlem Tutarı</th>
+                    <th>Ağırlıklı Ortalama Fiyat</th>
+                </tr>                
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let xmlContent = '';
+        let tableBooks = document.getElementById('days');
+        fetch('days.xml').then((response)=> {
+            response.text().then((xml)=>{
+                xmlContent = xml;
+
+                let parser = new DOMParser();
+                let xmlDOM = parser.parseFromString(xmlContent, 'application/xml');
+                let books = xmlDOM.querySelectorAll('intraDayTradeHistoryList')
+
+                
+
+                books.forEach(bookXmlNode => {
+
+                    let row = document.createElement('tr');
+                    if (bookXmlNode.children[2].innerHTML.startsWith('PH')){
+                        // sadece PH ile baslayanlarin oldugunu consolda kontrol
+                        //console.log(date)
+                           
+
+                           //tarih
+                           let td = document.createElement('td');                                                                                      
+                        
+                           
+                           // 2serli gruplara ayirarak bir listeye ekledim ve Datetime modulune donusturdum.                           
+                           list=[]
+                           list.push(bookXmlNode.children[2].innerHTML.split(/(?=(?:..)*$)/))
+                           let datee= new Date(list[0][1],list[0][2],list[0][3],list[0][4])
+                           var monthh = datee.getUTCMonth() + 1; //months from 1-12
+                           var dayy = datee.getUTCDate();
+                           var yearr = datee.getUTCFullYear().toString()
+                           var hours = datee.getHours()                                                    
+
+                           td.innerText = dayy + "/" + monthh + "/" + yearr.slice(2,4) + ' ' + hours + ':00'
+ 
+                     
+                           row.appendChild(td);
+                           
+
+       
+                           //  toplam islem miktari
+                           td = document.createElement('td');
+                           td.innerText = (bookXmlNode.children[4].innerHTML/10)
+                           row.appendChild(td);                          
+                          
+   
+                           
+                           //toplam islem tutari
+                           td = document.createElement('td');
+                           td.innerText =  (bookXmlNode.children[3].innerHTML*bookXmlNode.children[4].innerHTML)/10 + ' ' + 'TL' 
+                           row.appendChild(td);
+
+   
+   
+                           //Agirlikli ortalama fiyat
+                           td = document.createElement('td');
+                           td.innerText = ( (bookXmlNode.children[3].innerHTML*bookXmlNode.children[4].innerHTML)/10) / (bookXmlNode.children[4].innerHTML/10)
+                           row.appendChild(td);
+
+                           
+                           tableBooks.children[1].appendChild(row);
+                          
+                           
+
+                           
+                           
+                    }
+                     
+                    
+                
+                    
+
+                    
+                });
+
+                
+                
+            });
+        });    
+    </script>
+
+    <script src="bati.js"></script>
+</body>
+</html>
